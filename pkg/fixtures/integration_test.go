@@ -51,3 +51,19 @@ func TestScenarioScaleDownBinpack(t *testing.T) {
 		t.Fatalf("expected scores 3->2, got %.0f->%.0f", decision.ScoreBefore, decision.ScoreAfter)
 	}
 }
+
+func TestScenarioNoScaleDown(t *testing.T) {
+	path := filepath.Join("..", "..", "testdata", "scenarios", "no-scale-down.yaml")
+	scenario, err := LoadScenario(path)
+	if err != nil {
+		t.Fatalf("load scenario: %v", err)
+	}
+	if err := ValidateScenario(scenario); err != nil {
+		t.Fatalf("validate scenario: %v", err)
+	}
+
+	_, _, _, binpackCfg := ToSnapshot(scenario)
+	if binpackCfg.Victims != 0 {
+		t.Fatalf("expected no binpack victims, got %d", binpackCfg.Victims)
+	}
+}

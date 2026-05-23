@@ -1,9 +1,11 @@
 package main
 
 import (
+	"flag"
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"testing"
 
 	"koord-descheduler-balance-poc/pkg/binpack"
@@ -13,6 +15,8 @@ import (
 	"koord-descheduler-balance-poc/pkg/model"
 	"koord-descheduler-balance-poc/pkg/report"
 )
+
+var updateGolden = flag.Bool("update-golden", false, "update golden files")
 
 func TestSummaryGoldenBasicImbalance(t *testing.T) {
 	assertGoldenSummary(t, "basic-imbalance.yaml", "basic-imbalance.txt")
@@ -51,8 +55,19 @@ func assertGoldenSummary(t *testing.T, scenarioFile, goldenFile string) {
 	if err != nil {
 		t.Fatalf("read golden: %v", err)
 	}
-	if summary != string(golden) {
-		t.Fatalf("summary mismatch\nexpected:\n%s\n\nactual:\n%s", string(golden), summary)
+
+	normalizedSummary := normalizeSummary(summary)
+	normalizedGolden := normalizeSummary(string(golden))
+
+	if *updateGolden {
+		if err := os.WriteFile(goldenPath, []byte(normalizedSummary+"\n"), 0644); err != nil {
+			t.Fatalf("update golden: %v", err)
+		}
+		return
+	}
+
+	if normalizedSummary != normalizedGolden {
+		t.Fatalf("summary mismatch\nexpected:\n%s\n\nactual:\n%s", normalizedGolden, normalizedSummary)
 	}
 }
 
@@ -75,4 +90,8 @@ func computeScoresForTest(snapshot *model.ClusterSnapshot, cfg model.ImbalanceCo
 		scores = append(scores, imbalance.ScoreNode(node, snapshot, cfg))
 	}
 	return scores
+}
+
+func normalizeSummary(value string) string {
+	return strings.TrimRight(value, " \n\t\r")
 }

@@ -123,6 +123,11 @@ Run all tests:
 go test ./...
 ```
 
+Update golden summaries intentionally:
+```
+go test ./cmd/poc -update-golden
+```
+
 Coverage includes:
 - Unit tests for scoring math, eviction filtering, and binpack selection.
 - Integration tests that load fixtures and assert victim selection.

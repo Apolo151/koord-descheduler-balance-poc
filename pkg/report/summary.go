@@ -58,5 +58,5 @@ func RenderSummary(result Result) string {
 		builder.WriteString(fmt.Sprintf("Nodes remaining: %s\n", strings.Join(result.Binpack.NodeSet, ", ")))
 	}
 
-	return builder.String()
+	return strings.TrimRight(builder.String(), " \n\t\r") + "\n"
 }
