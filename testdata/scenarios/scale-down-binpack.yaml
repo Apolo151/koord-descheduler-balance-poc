@@ -1,0 +1,63 @@
+metadata:
+  name: scale-down-binpack
+cluster:
+  pods:
+    default/app-a:
+      owner: app
+      resources:
+        cpu: 2
+        memory: 2
+      labels:
+        app: demo
+      evictable: true
+    default/app-b:
+      owner: app
+      resources:
+        cpu: 2
+        memory: 2
+      labels:
+        app: demo
+      evictable: true
+    default/app-c:
+      owner: app
+      resources:
+        cpu: 2
+        memory: 2
+      labels:
+        app: demo
+      evictable: true
+  nodes:
+    node-a:
+      allocatable:
+        cpu: 10
+        memory: 10
+      pods:
+        - default/app-a
+    node-b:
+      allocatable:
+        cpu: 10
+        memory: 10
+      pods:
+        - default/app-b
+    node-c:
+      allocatable:
+        cpu: 10
+        memory: 10
+      pods:
+        - default/app-c
+imbalanceConfig:
+  resources:
+    - cpu
+    - memory
+  threshold: 1.0
+evictionPolicy:
+  reservationFirst: true
+  denyNamespaces:
+    - kube-system
+binpackConfig:
+  targetWorkload: app
+  victims: 1
+events:
+  scaleDown:
+    targetWorkload: app
+    victims: 1

@@ -1,0 +1,16 @@
+Summary
+=======
+Nodes scored: 3
+Eviction plans: 0
+Binpack victims: 1
+
+Node imbalance
+--------------
+- node-a: mean=0.2000 std=0.0000
+- node-b: mean=0.2000 std=0.0000
+- node-c: mean=0.2000 std=0.0000
+
+Binpack decision
+----------------
+Victims: default/app-a
+Nodes remaining: node-b, node-c
