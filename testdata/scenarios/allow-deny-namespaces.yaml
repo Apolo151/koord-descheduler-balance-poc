@@ -1,0 +1,50 @@
+metadata:
+  name: allow-deny-namespaces
+cluster:
+  pods:
+    kube-system/sys:
+      owner: sys
+      resources:
+        cpu: 1
+        memory: 1
+      evictable: true
+    team-a/pod-a:
+      owner: app
+      resources:
+        cpu: 9
+        memory: 1
+      labels:
+        app: demo
+      evictable: true
+    default/pod-b:
+      owner: app
+      resources:
+        cpu: 0
+        memory: 4
+      labels:
+        app: demo
+      evictable: true
+  nodes:
+    node-a:
+      allocatable:
+        cpu: 10
+        memory: 10
+      pods:
+        - kube-system/sys
+        - team-a/pod-a
+        - default/pod-b
+imbalanceConfig:
+  resources:
+    - cpu
+    - memory
+  threshold: 0.1
+evictionPolicy:
+  reservationFirst: true
+  allowNamespaces:
+    - team-a
+  denyNamespaces:
+    - kube-system
+  maxEvictionsPerNode: 3
+binpackConfig:
+  victims: 0
+events: {}

@@ -33,6 +33,17 @@ func TestMeanStdDev(t *testing.T) {
 	}
 }
 
+func TestMeanStdDevSkipsMissingResources(t *testing.T) {
+	ratios := map[string]float64{"cpu": 0.5}
+	mean, stdDev := MeanStdDev(ratios, []string{"cpu", "memory"})
+	if !almostEqual(mean, 0.5) {
+		t.Fatalf("expected mean 0.5, got %v", mean)
+	}
+	if !almostEqual(stdDev, 0.0) {
+		t.Fatalf("expected stddev 0.0, got %v", stdDev)
+	}
+}
+
 func TestDeltaStdDevForPod(t *testing.T) {
 	snapshot := &model.ClusterSnapshot{
 		Nodes: map[string]*model.Node{
@@ -57,6 +68,31 @@ func TestDeltaStdDevForPod(t *testing.T) {
 	}
 	if !almostEqual(deltaB, -0.2) {
 		t.Fatalf("expected delta -0.2 for pod-b, got %v", deltaB)
+	}
+}
+
+func TestDeltaStdDevForPodNilInputs(t *testing.T) {
+	delta, stdDev := DeltaStdDevForPod(nil, nil, nil, model.ImbalanceConfig{})
+	if delta != 0 || stdDev != 0 {
+		t.Fatalf("expected zero delta/stddev for nil inputs, got %v/%v", delta, stdDev)
+	}
+}
+
+func TestScoreNodeUsesAllocatableKeys(t *testing.T) {
+	snapshot := &model.ClusterSnapshot{
+		Nodes: map[string]*model.Node{
+			"node-a": {Name: "node-a", Allocatable: model.ResourceVector{"cpu": 10, "memory": 10}, Pods: []string{"default/pod-a"}},
+		},
+		Pods: map[string]*model.Pod{
+			"default/pod-a": {Name: "pod-a", Namespace: "default", Resources: model.ResourceVector{"cpu": 2, "memory": 4}},
+		},
+	}
+	score := ScoreNode(snapshot.Nodes["node-a"], snapshot, model.ImbalanceConfig{})
+	if !almostEqual(score.Mean, 0.3) {
+		t.Fatalf("expected mean 0.3, got %v", score.Mean)
+	}
+	if !almostEqual(score.StdDev, 0.1) {
+		t.Fatalf("expected stddev 0.1, got %v", score.StdDev)
 	}
 }
 

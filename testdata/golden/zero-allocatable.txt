@@ -1,0 +1,8 @@
+Summary
+=======
+Nodes scored: 1
+Eviction plans: 0
+
+Node imbalance
+--------------
+- node-a: mean=0.0000 std=0.0000

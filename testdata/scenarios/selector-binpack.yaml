@@ -1,0 +1,84 @@
+metadata:
+  name: selector-binpack
+cluster:
+  pods:
+    default/app-a:
+      owner: other
+      resources:
+        cpu: 2
+        memory: 2
+      labels:
+        app: demo
+        tier: api
+      evictable: true
+    default/app-b:
+      owner: other
+      resources:
+        cpu: 2
+        memory: 2
+      labels:
+        app: demo
+        tier: api
+      evictable: true
+    default/app-c:
+      owner: other
+      resources:
+        cpu: 2
+        memory: 2
+      labels:
+        app: demo
+        tier: api
+      evictable: true
+    default/other:
+      owner: other
+      resources:
+        cpu: 1
+        memory: 1
+      labels:
+        app: other
+      evictable: true
+  nodes:
+    node-a:
+      allocatable:
+        cpu: 10
+        memory: 10
+      pods:
+        - default/app-a
+    node-b:
+      allocatable:
+        cpu: 10
+        memory: 10
+      pods:
+        - default/app-b
+    node-c:
+      allocatable:
+        cpu: 10
+        memory: 10
+      pods:
+        - default/app-c
+    node-d:
+      allocatable:
+        cpu: 10
+        memory: 10
+      pods:
+        - default/other
+imbalanceConfig:
+  resources:
+    - cpu
+    - memory
+  threshold: 1.0
+evictionPolicy:
+  reservationFirst: true
+  denyNamespaces:
+    - kube-system
+binpackConfig:
+  selector:
+    app: demo
+    tier: api
+  victims: 2
+events:
+  scaleDown:
+    selector:
+      app: demo
+      tier: api
+    victims: 2

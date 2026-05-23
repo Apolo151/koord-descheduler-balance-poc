@@ -1,0 +1,12 @@
+Summary
+=======
+Nodes scored: 1
+Eviction plans: 1
+
+Node imbalance
+--------------
+- node-a: mean=0.7000 std=0.2000
+
+Eviction plans
+--------------
+- node-a: candidates=0 chosen=0

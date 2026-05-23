@@ -1,0 +1,40 @@
+metadata:
+  name: no-evictable
+cluster:
+  pods:
+    default/pod-a:
+      owner: app
+      resources:
+        cpu: 9
+        memory: 1
+      labels:
+        app: demo
+      evictable: false
+    default/pod-b:
+      owner: app
+      resources:
+        cpu: 0
+        memory: 4
+      labels:
+        app: demo
+      evictable: false
+  nodes:
+    node-a:
+      allocatable:
+        cpu: 10
+        memory: 10
+      pods:
+        - default/pod-a
+        - default/pod-b
+imbalanceConfig:
+  resources:
+    - cpu
+    - memory
+  threshold: 0.1
+evictionPolicy:
+  reservationFirst: true
+  denyNamespaces:
+    - kube-system
+binpackConfig:
+  victims: 0
+events: {}

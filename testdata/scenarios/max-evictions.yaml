@@ -1,0 +1,50 @@
+metadata:
+  name: max-evictions
+cluster:
+  pods:
+    default/pod-a:
+      owner: app
+      resources:
+        cpu: 9
+        memory: 1
+      labels:
+        app: demo
+      evictable: true
+    default/pod-b:
+      owner: app
+      resources:
+        cpu: 0
+        memory: 4
+      labels:
+        app: demo
+      evictable: true
+    default/pod-c:
+      owner: app
+      resources:
+        cpu: 0
+        memory: 0
+      labels:
+        app: demo
+      evictable: true
+  nodes:
+    node-a:
+      allocatable:
+        cpu: 10
+        memory: 10
+      pods:
+        - default/pod-a
+        - default/pod-b
+        - default/pod-c
+imbalanceConfig:
+  resources:
+    - cpu
+    - memory
+  threshold: 0.1
+evictionPolicy:
+  reservationFirst: true
+  denyNamespaces:
+    - kube-system
+  maxEvictionsPerNode: 2
+binpackConfig:
+  victims: 0
+events: {}

@@ -18,12 +18,27 @@ import (
 
 var updateGolden = flag.Bool("update-golden", false, "update golden files")
 
-func TestSummaryGoldenBasicImbalance(t *testing.T) {
-	assertGoldenSummary(t, "basic-imbalance.yaml", "basic-imbalance.txt")
-}
+func TestSummaryGoldenScenarios(t *testing.T) {
+	cases := []struct {
+		scenario string
+		golden   string
+	}{
+		{scenario: "basic-imbalance.yaml", golden: "basic-imbalance.txt"},
+		{scenario: "scale-down-binpack.yaml", golden: "scale-down-binpack.txt"},
+		{scenario: "boundary-threshold.yaml", golden: "boundary-threshold.txt"},
+		{scenario: "max-evictions.yaml", golden: "max-evictions.txt"},
+		{scenario: "allow-deny-namespaces.yaml", golden: "allow-deny-namespaces.txt"},
+		{scenario: "selector-binpack.yaml", golden: "selector-binpack.txt"},
+		{scenario: "no-evictable.yaml", golden: "no-evictable.txt"},
+		{scenario: "zero-allocatable.yaml", golden: "zero-allocatable.txt"},
+	}
 
-func TestSummaryGoldenScaleDown(t *testing.T) {
-	assertGoldenSummary(t, "scale-down-binpack.yaml", "scale-down-binpack.txt")
+	for _, testCase := range cases {
+		testCase := testCase
+		t.Run(testCase.scenario, func(t *testing.T) {
+			assertGoldenSummary(t, testCase.scenario, testCase.golden)
+		})
+	}
 }
 
 func assertGoldenSummary(t *testing.T, scenarioFile, goldenFile string) {
