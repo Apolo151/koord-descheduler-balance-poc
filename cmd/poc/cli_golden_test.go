@@ -30,6 +30,7 @@ func assertGoldenSummary(t *testing.T, scenarioFile, goldenFile string) {
 	root := filepath.Join("..", "..")
 	scenarioPath := filepath.Join(root, "testdata", "scenarios", scenarioFile)
 	goldenPath := filepath.Join(root, "testdata", "golden", goldenFile)
+	htmlDir := filepath.Join(root, "ui")
 
 	scenario, err := fixtures.LoadScenario(scenarioPath)
 	if err != nil {
@@ -51,6 +52,9 @@ func assertGoldenSummary(t *testing.T, scenarioFile, goldenFile string) {
 	}
 
 	summary := report.RenderSummary(result)
+	if err := writeHTMLArtifact(htmlDir, scenarioPath, scenario.Metadata, snapshot, result); err != nil {
+		t.Fatalf("write html artifact: %v", err)
+	}
 	golden, err := os.ReadFile(goldenPath)
 	if err != nil {
 		t.Fatalf("read golden: %v", err)
@@ -69,6 +73,32 @@ func assertGoldenSummary(t *testing.T, scenarioFile, goldenFile string) {
 	if normalizedSummary != normalizedGolden {
 		t.Fatalf("summary mismatch\nexpected:\n%s\n\nactual:\n%s", normalizedGolden, normalizedSummary)
 	}
+}
+
+func writeHTMLArtifact(outputDir string, scenarioPath string, metadata map[string]string, snapshot *model.ClusterSnapshot, result report.Result) error {
+	if err := os.MkdirAll(outputDir, 0755); err != nil {
+		return err
+	}
+
+	name := scenarioTitle(scenarioPath, metadata)
+	if name == "" {
+		name = strings.TrimSuffix(filepath.Base(scenarioPath), filepath.Ext(scenarioPath))
+	}
+	name = sanitizeFilename(name)
+	if name == "" {
+		name = "scenario"
+	}
+
+	path := filepath.Join(outputDir, "test-"+name+".html")
+	visual, err := report.RenderHTML(snapshot, result, report.HTMLMetadata{
+		Title:       name,
+		Subtitle:    "Golden test visualization",
+		ScenarioRef: filepath.Base(scenarioPath),
+	})
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(path, []byte(visual), 0644)
 }
 
 func computeScoresForTest(snapshot *model.ClusterSnapshot, cfg model.ImbalanceConfig) []model.NodeImbalanceScore {
