@@ -61,6 +61,16 @@ Write outputs:
 go run ./cmd/poc --scenario testdata/scenarios/basic-imbalance.yaml --out-json out.json --out-summary out.txt
 ```
 
+Generate a static HTML visualization:
+```
+go run ./cmd/poc --scenario testdata/scenarios/basic-imbalance.yaml --out-html-dir ui
+```
+
+Serve the HTML output locally:
+```
+go run ./cmd/poc --scenario testdata/scenarios/basic-imbalance.yaml --out-html-dir ui --serve-html
+```
+
 ## Fixture schema (minimal example)
 
 ```
@@ -127,6 +137,8 @@ Update golden summaries intentionally:
 ```
 go test ./cmd/poc -update-golden
 ```
+
+Golden tests also emit HTML artifacts in [ui](ui).
 
 Coverage includes:
 - Unit tests for scoring math, eviction filtering, and binpack selection.
